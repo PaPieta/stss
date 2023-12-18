@@ -1,11 +1,10 @@
-# Structure Tensor for Python
-Fast and simple to use 2D and 3D [structure tensor](https://en.wikipedia.org/wiki/Structure_tensor) implementation for Python.
+# Structure Tensor for Python (Documentation To Be Expanded)
+2D and 3D [structure tensor](https://en.wikipedia.org/wiki/Structure_tensor) [scale space](https://en.wikipedia.org/wiki/Scale_space) implementation for Python.
+
+Forked from and based on Niels Jeppesen's [structure tensor repository](https://github.com/Skielex/structure-tensor/tree/master).
 
 ## Installation
-Install package using ```pip install structure-tensor``` or clone the repository.
-
-### CUDA Support
-For CUDA support install extra (optional) dependancy [CuPy](https://github.com/cupy/cupy). If CUDA is installed on your system, ```pip install cupy``` should be enough, but may be slow as CuPy will compile code during install. Alternatively use one of the [precompiled packages](https://github.com/cupy/cupy#installation).
+Install package using ```pip install st2ss``` or clone the repository.
 
 ## Tiny Examples
 The parameters for the structure tensor calculations are $\rho$ (```rho```) and $\sigma$ (```sigma```), which are scalar values.

@@ -3,21 +3,21 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setup(name="structure-tensor",
-      version="0.2.0",
-      author="Niels Jeppesen",
-      author_email="niejep@dtu.dk",
-      description="Fast and simple to use 2D and 3D structure tensor implementation for Python.",
+setup(name="st2ss",
+      version="0.1.0",
+      author="Pawel Pieta",
+      author_email="papi@dtu.dk",
+      description="2D and 3D structure tensor scale space implementation for Python.",
       long_description=long_description,
       long_description_content_type="text/markdown",
-      url="https://github.com/Skielex/structure-tensor",
+      url="https://github.com/PaPieta/st2ss",
       packages=[
           "structure_tensor",
           "structure_tensor.cp",
       ],
       python_requires='>=3',
       install_requires=["numpy>=1.16", "scipy>=1.3"],
-      extras_require={"CuPy": ["cupy>=8"]},
+    #   extras_require={"CuPy": ["cupy>=8"]},
       classifiers=[
           "Development Status :: 3 - Alpha",
           "Environment :: Console",
