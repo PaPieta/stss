@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -11,9 +11,10 @@ setup(name="st2ss",
       long_description=long_description,
       long_description_content_type="text/markdown",
       url="https://github.com/PaPieta/st2ss",
-      packages=[
-          "structure_tensor",
-      ],
+      packages=find_packages(),
+    # #   [
+    #       "structure_tensor",
+    #   ],
       python_requires='>=3',
       install_requires=["numpy>=1.16", "scipy>=1.3"],
     #   extras_require={"CuPy": ["cupy>=8"]},
