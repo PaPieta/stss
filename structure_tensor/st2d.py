@@ -4,17 +4,21 @@ import logging
 import numpy as np
 from scipy import ndimage
 
+from st2ss.structure_tensor import util
 
-def structure_tensor_2d(image, sigma, rho, out=None, truncate=4.0):
+
+def structure_tensor_2d(image, sigma, ring_filter=True, rho=None, out=None, truncate=4.0):
     """Structure tensor for 2D image data.
 
     Arguments:
         image: array_like
             A 2D array. Pass ndarray to avoid copying image.
         sigma: scalar
-            A noise scale, structures smaller than sigma will be removed by smoothing.
+            Derivative Gaussian filter size, correlated to feature size if ring_filter=True.
+        ring_filter: bool
+            If True, runs the algorithm version with ring filter instead of the integration filter
         rho: scalar
-            An integration scale giving the size over the neighborhood in which the
+            Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
             orientation is to be analysed.
         out: ndarray, optinal
             A Numpy array with the shape (3, volume.shape) in which to place the output.
@@ -27,15 +31,22 @@ def structure_tensor_2d(image, sigma, rho, out=None, truncate=4.0):
             (s_xx, s_yy, s_xy).
 
     Authors:
-        vand@dtu.dk, 2019; niejep@dtu.dk, 2020
+        vand@dtu.dk, 2019; niejep@dtu.dk, 2020, papi@dtu.dk, 2023
     """
 
     # Make sure it's a Numpy array.
     image = np.asarray(image)
 
     # Check data type. Must be floating point.
-    if not np.issubdtype(image.dtype, np.floating):
+    if  np.issubdtype(image.dtype, np.floating):
         logging.warning('image is not floating type array. This may result in a loss of precision and unexpected behavior.') 
+
+    # Check user input (ring filter vs integration filter).
+    if ring_filter==True and rho is not None:
+        logging.warning('rho is set with active ring filter. Rho value will have no effect.')
+    elif ring_filter==False and rho is None:
+        logging.warning('rho is not set while ring filter is disabled. Rho value will be set to 2*sigma.')
+        rho=2*sigma
 
     # Compute derivatives (Scipy implementation truncates filter at 4 sigma).
     Ix = ndimage.gaussian_filter(image, sigma, order=[1, 0], mode='nearest', truncate=truncate)
@@ -47,15 +58,30 @@ def structure_tensor_2d(image, sigma, rho, out=None, truncate=4.0):
     else:
         # S is already allocated. We assume the size is correct.
         S = out
-
-    # Integrate elements of structure tensor (Scipy uses sequence of 1D).
+    
     tmp = np.empty(image.shape, dtype=image.dtype)
-    np.multiply(Ix, Ix, out=tmp)
-    ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[0], truncate=truncate)
-    np.multiply(Iy, Iy, out=tmp)
-    ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[1], truncate=truncate)
-    np.multiply(Ix, Iy, out=tmp)
-    ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[2], truncate=truncate)
+
+    if ring_filter:
+        sigma_r = 0.9506 * (sigma)
+        # Integrate elements of structure tensor with the ring filter.
+        np.multiply(Ix, Ix, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[0], truncate=truncate)
+        np.multiply(Iy, Iy, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[1], truncate=truncate)
+        np.multiply(Ix, Iy, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[2], truncate=truncate)
+ 
+    else:
+        # Integrate elements of structure tensor (Scipy uses sequence of 1D).
+        np.multiply(Ix, Ix, out=tmp)
+        ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[0], truncate=truncate)
+        np.multiply(Iy, Iy, out=tmp)
+        ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[1], truncate=truncate)
+        np.multiply(Ix, Iy, out=tmp)
+        ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[2], truncate=truncate)
+
+    # Normalize S scale response
+    S = S*(sigma**(2*1.2))
 
     return S
 
@@ -112,4 +138,6 @@ def eig_special_2d(S):
     vec /= vec_norm
 
     # Reshape and return.
-    return val.reshape(val.shape[:1] + input_shape[1:]), vec.reshape(vec.shape[:1] + input_shape[1:])
+    val = val.reshape(val.shape[:1] + input_shape[1:])
+    vec = vec.reshape(vec.shape[:1] + input_shape[1:])
+    return val, vec

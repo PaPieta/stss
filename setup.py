@@ -13,7 +13,6 @@ setup(name="st2ss",
       url="https://github.com/PaPieta/st2ss",
       packages=[
           "structure_tensor",
-          "structure_tensor.cp",
       ],
       python_requires='>=3',
       install_requires=["numpy>=1.16", "scipy>=1.3"],

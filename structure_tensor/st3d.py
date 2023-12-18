@@ -4,17 +4,20 @@ import logging
 import numpy as np
 from scipy.ndimage import filters
 
+from st2ss.structure_tensor import util
 
-def structure_tensor_3d(volume, sigma, rho, out=None, truncate=4.0):
+def structure_tensor_3d(volume, sigma, ring_filter=True, rho=None, out=None, truncate=4.0):
     """Structure tensor for 3D image data.
 
     Arguments:
         volume: array_like
             A 3D array. Pass ndarray to avoid copying volume.
         sigma: scalar
-            A noise scale, structures smaller than sigma will be removed by smoothing.
+            Derivative Gaussian filter size, correlated to feature size if ring_filter=True.
+        ring_filter: bool
+            If True, runs the algorithm version with ring filter instead of the integration filter
         rho: scalar
-            An integration scale giving the size over the neighborhood in which the
+            Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
             orientation is to be analysed.
         out: ndarray, optional
             A Numpy array with the shape (6, volume.shape) in which to place the output.
@@ -36,6 +39,13 @@ def structure_tensor_3d(volume, sigma, rho, out=None, truncate=4.0):
     if not np.issubdtype(volume.dtype, np.floating):
         logging.warning('volume is not floating type array. This may result in a loss of precision and unexpected behavior.')  
 
+    # Check user input (ring filter vs integration filter).
+    if ring_filter==True and rho is not None:
+        logging.warning('rho is set with active ring filter. Rho value will have no effect.')
+    elif ring_filter==False and rho is None:
+        logging.warning('rho is not set while ring filter is disabled. Rho value will be set to 2*sigma.')
+        rho=2*sigma
+
     # Computing derivatives (scipy implementation truncates filter at 4 sigma).
     Vx = filters.gaussian_filter(volume, sigma, order=[0, 0, 1], mode='nearest', truncate=truncate)
     Vy = filters.gaussian_filter(volume, sigma, order=[0, 1, 0], mode='nearest', truncate=truncate)
@@ -48,20 +58,41 @@ def structure_tensor_3d(volume, sigma, rho, out=None, truncate=4.0):
         # S is already allocated. We assume the size is correct.
         S = out
 
-    # Integrating elements of structure tensor (scipy uses sequence of 1D).
     tmp = np.empty(volume.shape, dtype=volume.dtype)
-    np.multiply(Vx, Vx, out=tmp)
-    filters.gaussian_filter(tmp, rho, mode='nearest', output=S[0], truncate=truncate)
-    np.multiply(Vy, Vy, out=tmp)
-    filters.gaussian_filter(tmp, rho, mode='nearest', output=S[1], truncate=truncate)
-    np.multiply(Vz, Vz, out=tmp)
-    filters.gaussian_filter(tmp, rho, mode='nearest', output=S[2], truncate=truncate)
-    np.multiply(Vx, Vy, out=tmp)
-    filters.gaussian_filter(tmp, rho, mode='nearest', output=S[3], truncate=truncate)
-    np.multiply(Vx, Vz, out=tmp)
-    filters.gaussian_filter(tmp, rho, mode='nearest', output=S[4], truncate=truncate)
-    np.multiply(Vy, Vz, out=tmp)
-    filters.gaussian_filter(tmp, rho, mode='nearest', output=S[5], truncate=truncate)
+
+    if ring_filter:
+        sigma_r = 0.9506 * (sigma)
+        # Integrate elements of structure tensor with the ring filter.
+        np.multiply(Vx, Vx, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[0], truncate=truncate)
+        np.multiply(Vy, Vy, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[1], truncate=truncate)
+        np.multiply(Vz, Vz, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[2], truncate=truncate)
+        np.multiply(Vx, Vy, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[3], truncate=truncate)
+        np.multiply(Vx, Vz, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[4], truncate=truncate)
+        np.multiply(Vy, Vz, out=tmp)
+        util.ring_filter(tmp, sigma_r, mode='nearest', output=S[5], truncate=truncate)
+
+    else:
+        # Integrating elements of structure tensor (scipy uses sequence of 1D).
+        np.multiply(Vx, Vx, out=tmp)
+        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[0], truncate=truncate)
+        np.multiply(Vy, Vy, out=tmp)
+        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[1], truncate=truncate)
+        np.multiply(Vz, Vz, out=tmp)
+        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[2], truncate=truncate)
+        np.multiply(Vx, Vy, out=tmp)
+        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[3], truncate=truncate)
+        np.multiply(Vx, Vz, out=tmp)
+        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[4], truncate=truncate)
+        np.multiply(Vy, Vz, out=tmp)
+        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[5], truncate=truncate)
+
+    # Normalize S scale response
+    S = S*(sigma**(2*1.2))
 
     return S
 
@@ -261,4 +292,8 @@ def eig_special_3d(S, full=False):
     np.sqrt(l, out=l)
     vec /= l
 
-    return val.reshape(val.shape[:-1] + input_shape[1:]), vec.reshape(vec.shape[:-1] + input_shape[1:])
+    # Reshape and return.
+    val = val.reshape(val.shape[:-1] + input_shape[1:])
+    vec = vec.reshape(vec.shape[:-1] + input_shape[1:])
+    vec = vec[[2,1,0],:] # Reorder eigenvectors to XYZ order
+    return val, vec
