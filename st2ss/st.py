@@ -120,7 +120,7 @@ def scale_space(image, sigma_list, correctScale=True, ring_filter=True, rho_list
     # Loop over scales
     for i in range(len(sigma_list)):
         # Compute structure tensor at a single scale
-        structure_tensor(image, sigma_list[i], ring_filter, rho_list[i], S, eig_decomp=False, truncate=truncate)
+        S = structure_tensor(image, sigma_list[i], ring_filter, rho_list[i], S, eig_decomp=False, truncate=truncate)
 
         # Compute trace of the structure tensor matrix
         discr = np.sum(S[0:np.ceil(S_size/2).astype(int)],axis=0)
@@ -130,10 +130,6 @@ def scale_space(image, sigma_list, correctScale=True, ring_filter=True, rho_list
             scale_opt = np.ones(image.shape, dtype=float)*sigma_list[i]
             discr_opt = np.copy(discr)
         else:
-            # swapIdx = np.repeat(discr[None,:]>discr_opt[None,:],S.ndim,axis=0)
-            # S_opt[swapIdx] = S[swapIdx]
-            # scale_opt[swapIdx[0]] = sigma_list[i]  
-            # discr_opt[swapIdx[0]] = discr[swapIdx[0]]
             S_opt = np.where(discr>discr_opt, S, S_opt)
             scale_opt = np.where(discr>discr_opt, sigma_list[i], scale_opt)
             discr_opt = np.where(discr>discr_opt, discr, discr_opt)

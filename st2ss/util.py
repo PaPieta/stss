@@ -20,9 +20,9 @@ def gauss_no_norm(t, truncate=4.0):
 
     s = np.sqrt(t)
     x = np.arange(int(-np.round(s*truncate)), int(np.round(s*truncate))+1)
-    # x = np.reshape(x,(-1,1))
     g = np.exp(-x**2/(2*t))
     return g
+
 
 def ring_convolve(image, sigma_r, truncate=4.0, mode='nearest', cval=0.0, origin=0):
     """Convolves an image with a ring filter.
@@ -89,7 +89,7 @@ def correct_scale(scale, val):
         plan = (val[2]-val[1])/val[2]
         sph = val[0]/val[2]
         m = 1.07; l = 0.65; p = 1; s = 0.5
-        scale = scale/(m*(l*lin+p*plan+s*sph))
+        scale = (scale/(m*(l*lin+p*plan+s*sph)))/0.372
     else:
         raise ValueError('Scale must be 2D or 3D.')
 

@@ -47,7 +47,7 @@ def structure_tensor_2d(image, sigma, ring_filter=True, rho=None, out=None, trun
     elif ring_filter==False and rho is None:
         logging.warning('rho is not set while ring filter is disabled. Rho value will be set to 2*sigma.')
         rho=2*sigma
-
+    
     # Compute derivatives (Scipy implementation truncates filter at 4 sigma).
     Ix = ndimage.gaussian_filter(image, sigma, order=[1, 0], mode='nearest', truncate=truncate)
     Iy = ndimage.gaussian_filter(image, sigma, order=[0, 1], mode='nearest', truncate=truncate)
