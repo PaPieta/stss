@@ -38,7 +38,7 @@ sigma = 1.5
 # Load 2D data.
 image = np.random.random((128, 128))
 
-S, val, vec = st.structure_tensor(image, sigma, rho)
+S, val, vec = st.structure_tensor(image, sigma)
 ```
 
 Compared to the original [structure tensor repository](https://github.com/Skielex/structure-tensor/tree/master), for volume with shape ```(x, y, z)``` the eigenvectors (```vec```) are returned in the order ```xyz```, not ```zyx```.
@@ -51,14 +51,14 @@ Scale space method returns an additional parameter ```scale``` containing scale 
 
 ``` python
 import numpy as np
-from structure_tensor import st
+from st2ss import st
 
 sigma_list = np.arange(1,6,0.1)
 
 # Load 3D data.
 volume = np.random.random((128, 128, 128))
 
-S, val, vec, scale = st.scale_space(volume, sigma, rho)
+S, val, vec, scale = st.scale_space(volume, sigma)
 ```
 
 <!-- ## Advanced examples --> 
