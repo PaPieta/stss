@@ -10,7 +10,7 @@ For theoretical details see: (Publication to be added)
 2. Install the library
 
 ```
-   cd st2ss
+   cd st_v2_ss
    pip install .
 ```
 > Support for direct pip installation coming soon
@@ -58,7 +58,7 @@ sigma_list = np.arange(1,6,0.1)
 # Load 3D data.
 volume = np.random.random((128, 128, 128))
 
-S, val, vec, scale = st.scale_space(volume, sigma)
+S, val, vec, scale = st.scale_space(volume, sigma_list)
 ```
 
 <!-- ## Advanced examples --> 
