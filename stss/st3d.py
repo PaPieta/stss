@@ -4,9 +4,12 @@ import logging
 import numpy as np
 from scipy.ndimage import filters
 
-from st2ss import util
+from stss import util
 
-def structure_tensor_3d(volume, sigma, ring_filter=True, rho=None, out=None, truncate=4.0):
+
+def structure_tensor_3d(
+    volume, sigma, ring_filter=True, rho=None, out=None, truncate=4.0
+):
     """Structure tensor for 3D image data.
 
     Arguments:
@@ -37,23 +40,35 @@ def structure_tensor_3d(volume, sigma, ring_filter=True, rho=None, out=None, tru
 
     # Check data type. Must be floating point.
     if not np.issubdtype(volume.dtype, np.floating):
-        logging.warning('volume is not floating type array. This may result in a loss of precision and unexpected behavior.')  
+        logging.warning(
+            "volume is not floating type array. This may result in a loss of precision and unexpected behavior."
+        )
 
     # Check user input (ring filter vs integration filter).
-    if ring_filter==True and rho is not None:
-        logging.warning('rho is set with active ring filter. Rho value will have no effect.')
-    elif ring_filter==False and rho is None:
-        logging.warning('rho is not set while ring filter is disabled. Rho value will be set to 2*sigma.')
-        rho=2*sigma
+    if ring_filter is True and rho is not None:
+        logging.warning(
+            "rho is set with active ring filter. Rho value will have no effect."
+        )
+    elif ring_filter is False and rho is None:
+        logging.warning(
+            "rho is not set while ring filter is disabled. Rho value will be set to 2*sigma."
+        )
+        rho = 2 * sigma
 
     # Computing derivatives (scipy implementation truncates filter at 4 sigma).
-    Vx = filters.gaussian_filter(volume, sigma, order=[0, 0, 1], mode='nearest', truncate=truncate)
-    Vy = filters.gaussian_filter(volume, sigma, order=[0, 1, 0], mode='nearest', truncate=truncate)
-    Vz = filters.gaussian_filter(volume, sigma, order=[1, 0, 0], mode='nearest', truncate=truncate)
+    Vx = filters.gaussian_filter(
+        volume, sigma, order=[0, 0, 1], mode="nearest", truncate=truncate
+    )
+    Vy = filters.gaussian_filter(
+        volume, sigma, order=[0, 1, 0], mode="nearest", truncate=truncate
+    )
+    Vz = filters.gaussian_filter(
+        volume, sigma, order=[1, 0, 0], mode="nearest", truncate=truncate
+    )
 
     if out is None:
         # Allocate S.
-        S = np.empty((6, ) + volume.shape, dtype=volume.dtype)
+        S = np.empty((6,) + volume.shape, dtype=volume.dtype)
     else:
         # S is already allocated. We assume the size is correct.
         S = out
@@ -64,35 +79,47 @@ def structure_tensor_3d(volume, sigma, ring_filter=True, rho=None, out=None, tru
         sigma_r = 0.9506 * (sigma)
         # Integrate elements of structure tensor with the ring filter.
         np.multiply(Vx, Vx, out=tmp)
-        S[0] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
+        S[0] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
         np.multiply(Vy, Vy, out=tmp)
-        S[1] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
+        S[1] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
         np.multiply(Vz, Vz, out=tmp)
-        S[2] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
+        S[2] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
         np.multiply(Vx, Vy, out=tmp)
-        S[3] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
+        S[3] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
         np.multiply(Vx, Vz, out=tmp)
-        S[4] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
+        S[4] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
         np.multiply(Vy, Vz, out=tmp)
-        S[5] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
+        S[5] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
 
     else:
         # Integrating elements of structure tensor (scipy uses sequence of 1D).
         np.multiply(Vx, Vx, out=tmp)
-        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[0], truncate=truncate)
+        filters.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[0], truncate=truncate
+        )
         np.multiply(Vy, Vy, out=tmp)
-        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[1], truncate=truncate)
+        filters.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[1], truncate=truncate
+        )
         np.multiply(Vz, Vz, out=tmp)
-        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[2], truncate=truncate)
+        filters.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[2], truncate=truncate
+        )
         np.multiply(Vx, Vy, out=tmp)
-        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[3], truncate=truncate)
+        filters.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[3], truncate=truncate
+        )
         np.multiply(Vx, Vz, out=tmp)
-        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[4], truncate=truncate)
+        filters.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[4], truncate=truncate
+        )
         np.multiply(Vy, Vz, out=tmp)
-        filters.gaussian_filter(tmp, rho, mode='nearest', output=S[5], truncate=truncate)
+        filters.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[5], truncate=truncate
+        )
 
     # Normalize S scale response
-    S = S*(sigma**(2*1.2))
+    S = S * (sigma ** (2 * 1.2))
 
     return S
 
@@ -128,7 +155,7 @@ def eig_special_3d(S, full=False):
 
     # Check data type. Must be floating point.
     if not np.issubdtype(S.dtype, np.floating):
-        raise ValueError('S must be floating point type.')
+        raise ValueError("S must be floating point type.")
 
     # Flatten S.
     input_shape = S.shape
@@ -141,15 +168,15 @@ def eig_special_3d(S, full=False):
 
     # Allocate vec and val. We will use them for intermediate computations as well.
     if full:
-        val = np.empty((3, ) + S.shape[1:], dtype=S.dtype)
-        vec = np.empty((9, ) + S.shape[1:], dtype=S.dtype)
-        tmp = np.empty((4, ) + S.shape[1:], dtype=S.dtype)
+        val = np.empty((3,) + S.shape[1:], dtype=S.dtype)
+        vec = np.empty((9,) + S.shape[1:], dtype=S.dtype)
+        tmp = np.empty((4,) + S.shape[1:], dtype=S.dtype)
         B03 = val
         B36 = vec[:3]
     else:
-        val = np.empty((3, ) + S.shape[1:], dtype=S.dtype)
-        vec = np.empty((3, ) + S.shape[1:], dtype=S.dtype)
-        tmp = np.empty((4, ) + S.shape[1:], dtype=S.dtype)
+        val = np.empty((3,) + S.shape[1:], dtype=S.dtype)
+        vec = np.empty((3,) + S.shape[1:], dtype=S.dtype)
+        tmp = np.empty((4,) + S.shape[1:], dtype=S.dtype)
         B03 = val
         B36 = vec
 
@@ -171,11 +198,11 @@ def eig_special_3d(S, full=False):
     Sq = np.subtract(S[:3], q, out=B03)
 
     # Compute s, off-diagonal elements. Store in part of B not yet used.
-    s = np.einsum('ij,ij->j', S[3:], S[3:], out=tmp[1])
+    s = np.einsum("ij,ij->j", S[3:], S[3:], out=tmp[1])
     s *= 2
 
     # Compute p.
-    p = np.einsum('ij,ij->j', Sq, Sq, out=tmp[2])
+    p = np.einsum("ij,ij->j", Sq, Sq, out=tmp[2])
     del Sq  # Last use of Sq.
     p += s
 
@@ -283,11 +310,11 @@ def eig_special_3d(S, full=False):
     # Normalizing -- depends on number of vectors.
     if full:
         # vec is [x1 x2 x3, y1 y2 y3, z1 z2 z3]
-        l = np.einsum('ijk,ijk->jk', vec, vec, out=vec_tmp)[:, np.newaxis]
+        l = np.einsum("ijk,ijk->jk", vec, vec, out=vec_tmp)[:, np.newaxis]
         vec = np.swapaxes(vec, 0, 1)
     else:
         # vec is [x1 y1 z1] = v1
-        l = np.einsum('ij,ij->j', vec, vec, out=vec_tmp)
+        l = np.einsum("ij,ij->j", vec, vec, out=vec_tmp)
 
     np.sqrt(l, out=l)
     vec /= l
@@ -295,5 +322,5 @@ def eig_special_3d(S, full=False):
     # Reshape and return.
     val = val.reshape(val.shape[:-1] + input_shape[1:])
     vec = vec.reshape(vec.shape[:-1] + input_shape[1:])
-    vec = vec[[2,1,0],:] # Reorder eigenvectors to XYZ order
+    vec = vec[[2, 1, 0], :]  # Reorder eigenvectors to XYZ order
     return val, vec

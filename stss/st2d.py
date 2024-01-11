@@ -4,10 +4,12 @@ import logging
 import numpy as np
 from scipy import ndimage
 
-from st2ss import util
+from stss import util
 
 
-def structure_tensor_2d(image, sigma, ring_filter=True, rho=None, out=None, truncate=4.0):
+def structure_tensor_2d(
+    image, sigma, ring_filter=True, rho=None, out=None, truncate=4.0
+):
     """Structure tensor for 2D image data.
 
     Arguments:
@@ -39,49 +41,65 @@ def structure_tensor_2d(image, sigma, ring_filter=True, rho=None, out=None, trun
 
     # Check data type. Must be floating point.
     if not np.issubdtype(image.dtype, np.floating):
-        logging.warning('image is not floating type array. This may result in a loss of precision and unexpected behavior.') 
+        logging.warning(
+            "image is not floating type array. This may result in a loss of precision and unexpected behavior."
+        )
 
     # Check user input (ring filter vs integration filter).
-    if ring_filter==True and rho is not None:
-        logging.warning('rho is set with active ring filter. Rho value will have no effect.')
-    elif ring_filter==False and rho is None:
-        logging.warning('rho is not set while ring filter is disabled. Rho value will be set to 2*sigma.')
-        rho=2*sigma
-    
+    if ring_filter is True and rho is not None:
+        logging.warning(
+            "rho is set with active ring filter. Rho value will have no effect."
+        )
+    elif ring_filter is False and rho is None:
+        logging.warning(
+            "rho is not set while ring filter is disabled. Rho value will be set to 2*sigma."
+        )
+        rho = 2 * sigma
+
     # Compute derivatives (Scipy implementation truncates filter at 4 sigma).
-    Ix = ndimage.gaussian_filter(image, sigma, order=[1, 0], mode='nearest', truncate=truncate)
-    Iy = ndimage.gaussian_filter(image, sigma, order=[0, 1], mode='nearest', truncate=truncate)
+    Ix = ndimage.gaussian_filter(
+        image, sigma, order=[1, 0], mode="nearest", truncate=truncate
+    )
+    Iy = ndimage.gaussian_filter(
+        image, sigma, order=[0, 1], mode="nearest", truncate=truncate
+    )
 
     if out is None:
         # Allocate S.
-        S = np.empty((3, ) + image.shape, dtype=image.dtype)
+        S = np.empty((3,) + image.shape, dtype=image.dtype)
     else:
         # S is already allocated. We assume the size is correct.
         S = out
-    
+
     tmp = np.empty(image.shape, dtype=image.dtype)
 
     if ring_filter:
         sigma_r = 0.9506 * (sigma)
         # Integrate elements of structure tensor with the ring filter.
         np.multiply(Ix, Ix, out=tmp)
-        S[0] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
+        S[0] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
         np.multiply(Iy, Iy, out=tmp)
-        S[1] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
+        S[1] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
         np.multiply(Ix, Iy, out=tmp)
-        S[2] = util.ring_convolve(tmp, sigma_r, mode='nearest', truncate=truncate)
- 
+        S[2] = util.ring_convolve(tmp, sigma_r, mode="nearest", truncate=truncate)
+
     else:
         # Integrate elements of structure tensor (Scipy uses sequence of 1D).
         np.multiply(Ix, Ix, out=tmp)
-        ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[0], truncate=truncate)
+        ndimage.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[0], truncate=truncate
+        )
         np.multiply(Iy, Iy, out=tmp)
-        ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[1], truncate=truncate)
+        ndimage.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[1], truncate=truncate
+        )
         np.multiply(Ix, Iy, out=tmp)
-        ndimage.gaussian_filter(tmp, rho, mode='nearest', output=S[2], truncate=truncate)
+        ndimage.gaussian_filter(
+            tmp, rho, mode="nearest", output=S[2], truncate=truncate
+        )
 
     # Normalize S scale response
-    S = S*(sigma**(2*1.2))
+    S = S * (sigma ** (2 * 1.2))
 
     return S
 
@@ -133,7 +151,7 @@ def eig_special_2d(S):
     vec[:, aligned] = 1 - np.argsort(S[:2, aligned], axis=0)
 
     # Normalize.
-    vec_norm = np.einsum('ij,ij->j', vec, vec)
+    vec_norm = np.einsum("ij,ij->j", vec, vec)
     np.sqrt(vec_norm, out=vec_norm)
     vec /= vec_norm
 

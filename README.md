@@ -10,7 +10,7 @@ For theoretical details see: (Publication to be added)
 2. Install the library
 
 ```
-   cd st_v2_ss
+   cd stss
    pip install .
 ```
 > Support for direct pip installation coming soon
@@ -31,7 +31,7 @@ The ```st2ss``` package support doing either 2D or 3D structure tensor analysis.
 
 ``` python
 import numpy as np
-from st2ss import st
+from stss import st
 
 sigma = 1.5
 
@@ -51,7 +51,7 @@ Scale space method returns an additional parameter ```scale``` containing scale 
 
 ``` python
 import numpy as np
-from st2ss import st
+from stss import st
 
 sigma_list = np.arange(1,6,0.1)
 

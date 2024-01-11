@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stss"
+version = "0.1.0"
+authors = [{name = "Pawel Tomasz Pieta", email = "papi@dtu.dk"}]
+description = "2D and 3D structure tensor scale space implementation for Python."
+requires-python = ">=3.8"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
