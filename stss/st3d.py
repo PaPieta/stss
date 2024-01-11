@@ -118,9 +118,6 @@ def structure_tensor_3d(
             tmp, rho, mode="nearest", output=S[5], truncate=truncate
         )
 
-    # Normalize S scale response
-    S = S * (sigma ** (2 * 1.2))
-
     return S
 
 

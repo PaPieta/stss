@@ -98,9 +98,6 @@ def structure_tensor_2d(
             tmp, rho, mode="nearest", output=S[2], truncate=truncate
         )
 
-    # Normalize S scale response
-    S = S * (sigma ** (2 * 1.2))
-
     return S
 
 

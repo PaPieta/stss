@@ -1,6 +1,6 @@
 import numpy as np
 from stss import st2d, st3d, util
-
+import warnings
 
 def structure_tensor(
     image, sigma, ring_filter=True, rho=None, out_S=None, eig_decomp=True, truncate=4.0
@@ -65,7 +65,7 @@ def structure_tensor(
 
 
 def scale_space(
-    image, sigma_list, correctScale=True, ring_filter=True, rho_list=None, truncate=4.0
+    image, sigma_list, correctScale=True, ring_filter=True, rho_list=None, gamma=1.2, truncate=4.0
 ):
     """Structure tensor scale space for 2D and 3D data. Returns a single structure tensor result for each pixel,
     chosen based on the scale that returns the highest trace of the structure tensor matrix.
@@ -83,8 +83,8 @@ def scale_space(
         rho: scalar
             Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
             orientation is to be analysed.
-        eig_decomp: bool
-            If True, the eigenvalues and eigenvectors of the structure tensor are computed.
+        gamma: float
+            Scale-space normalization parameter. Should be set to 1.2, change only for experimental purposes.
         truncate: float
             Truncate the filter at this many standard deviations. Default is 4.0.
 
@@ -117,6 +117,9 @@ def scale_space(
         S_size = 6
     else:
         raise ValueError("Image must be 2D or 3D.")
+    
+    if gamma != 1.2:
+        warnings.warn("Gamma is not 1.2. This may result in icorrect scale space calculation.")
 
     # Repeat rho if None
     if rho_list is None:
@@ -134,6 +137,10 @@ def scale_space(
             eig_decomp=False,
             truncate=truncate,
         )
+
+        # Normalize S scale response
+        
+        S = S * (sigma_list[i] ** (2 * gamma))
 
         # Compute trace of the structure tensor matrix
         discr = np.sum(S[0 : np.ceil(S_size / 2).astype(int)], axis=0)
