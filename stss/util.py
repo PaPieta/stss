@@ -4,13 +4,13 @@ from scipy.ndimage import convolve1d
 # Constant values for scale correction
 C_SIGMA_XF = 0.372
 
-C_2D_ANIS = 6.669e-02
+C_2D_ANIS = 0.0686
 C_2D_ISO = -1/3
 
-C_3D = 1.68
-C_3D_LIN = 0.167
+C_3D = 0.529
+C_3D_LIN = 0.327
 C_3D_PLAN = 1
-C_3D_SPH = -0.096
+C_3D_SPH = 0.0158
 
 
 def gauss_no_norm(t, truncate=4.0):
