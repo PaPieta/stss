@@ -2,10 +2,15 @@ import numpy as np
 from scipy.ndimage import convolve1d
 
 # Constant values for scale correction
-C = 1.07
-C_LIN = 0.65
-C_PLAN = 1
-C_SPH = 0.5
+C_SIGMA_XF = 0.372
+
+C_2D_ANIS = 6.669e-02
+C_2D_ISO = -1/3
+
+C_3D = 1.68
+C_3D_LIN = 0.167
+C_3D_PLAN = 1
+C_3D_SPH = -0.096
 
 
 def gauss_no_norm(t, truncate=4.0):
@@ -93,12 +98,16 @@ def correct_scale(scale, val):
     """
 
     if scale.ndim == 2:
-        scale = scale / (1.067 * (1 - 0.43 * val[0] / val[1])) / 0.372
+        iso = val[0] / val[1]
+        scale = scale / ( (1+C_2D_ANIS*(1-iso)) * (1+C_2D_ISO*iso) )
+        scale = scale / C_SIGMA_XF
     elif scale.ndim == 3:
         lin = (val[1] - val[0]) / val[2]
         plan = (val[2] - val[1]) / val[2]
         sph = val[0] / val[2]
-        scale = (scale / (C * (C_LIN * lin + C_PLAN * plan + C_SPH * sph))) / 0.372
+
+        scale = scale / (C_3D * (1+C_3D_SPH*sph) * (1+C_3D_PLAN*plan) * (1+C_3D_LIN*lin)) 
+        scale = scale / C_SIGMA_XF
     else:
         raise ValueError("Scale must be 2D or 3D.")
 
