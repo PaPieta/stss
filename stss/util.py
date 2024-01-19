@@ -4,7 +4,7 @@ from scipy.ndimage import convolve1d
 # Constant values for scale correction
 C_SIGMA_XF = 0.372
 
-C_2D_ANIS = 0.0686
+C_2D_ANIS = 0.0669
 C_2D_ISO = -1/3
 
 C_3D = 0.529
