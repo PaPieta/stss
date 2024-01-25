@@ -56,7 +56,7 @@ def structure_tensor(
     elif image.ndim == 3:
         S = st3d.structure_tensor_3d(image, sigma, ring_filter, rho, S, truncate)
         if eig_decomp:
-            val, vec = st2d.eig_special_3d(S)
+            val, vec = st3d.eig_special_3d(S)
             return S, val, vec
         else:
             return S
