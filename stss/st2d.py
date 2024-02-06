@@ -4,6 +4,18 @@ from scipy import ndimage
 
 from stss import util
 
+import logging
+import sys
+
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format="%(asctime)s : %(levelname)s : %(module)s : %(message)s",
+    datefmt="%I:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
+
 def structure_tensor_2d(
     image, sigma, ring_filter=True, rho=None, out=None, truncate=4.0
 ):

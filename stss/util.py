@@ -5,7 +5,7 @@ from scipy.ndimage import convolve1d
 C_SIGMA_XF = 0.372
 
 C_2D_ANIS = 0.0669
-C_2D_ISO = -1/3
+C_2D_ISO = -1 / 3
 
 C_3D = 0.529
 C_3D_LIN = 0.327
@@ -99,14 +99,16 @@ def correct_scale(scale, val):
 
     if scale.ndim == 2:
         iso = val[0] / val[1]
-        scale = scale / ( (1+C_2D_ANIS*(1-iso)) * (1+C_2D_ISO*iso) )
+        scale = scale / ((1 + C_2D_ANIS * (1 - iso)) * (1 + C_2D_ISO * iso))
         scale = scale / C_SIGMA_XF
     elif scale.ndim == 3:
         lin = (val[1] - val[0]) / val[2]
         plan = (val[2] - val[1]) / val[2]
         sph = val[0] / val[2]
 
-        scale = scale / (C_3D * (1+C_3D_SPH*sph) * (1+C_3D_PLAN*plan) * (1+C_3D_LIN*lin)) 
+        scale = scale / (
+            C_3D * (1 + C_3D_SPH * sph) * (1 + C_3D_PLAN * plan) * (1 + C_3D_LIN * lin)
+        )
         scale = scale / C_SIGMA_XF
     else:
         raise ValueError("Scale must be 2D or 3D.")

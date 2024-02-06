@@ -3,8 +3,15 @@ from stss import st2d, st3d, util
 
 import logging
 import sys
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s : %(levelname)s : %(module)s : %(message)s', datefmt='%I:%M:%S')
+
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format="%(asctime)s : %(levelname)s : %(module)s : %(message)s",
+    datefmt="%I:%M:%S",
+)
 logger = logging.getLogger(__name__)
+
 
 def structure_tensor(
     image, sigma, ring_filter=True, rho=None, out_S=None, eig_decomp=True, truncate=4.0
@@ -69,7 +76,13 @@ def structure_tensor(
 
 
 def scale_space(
-    image, sigma_list, correctScale=True, ring_filter=True, rho_list=None, gamma=1.2, truncate=4.0
+    image,
+    sigma_list,
+    correctScale=True,
+    ring_filter=True,
+    rho_list=None,
+    gamma=1.2,
+    truncate=4.0,
 ):
     """Structure tensor scale space for 2D and 3D data. Returns a single structure tensor result for each pixel,
     chosen based on the scale that returns the highest trace of the structure tensor matrix.
@@ -121,9 +134,11 @@ def scale_space(
         S_size = 6
     else:
         raise ValueError("Image must be 2D or 3D.")
-    
+
     if gamma != 1.2:
-        logger.warning("Gamma is not 1.2. This may result in icorrect scale space calculation.")
+        logger.warning(
+            "Gamma is not 1.2. This may result in icorrect scale space calculation."
+        )
 
     # Repeat rho if None
     if rho_list is None:
@@ -143,7 +158,7 @@ def scale_space(
         )
 
         # Normalize S scale response
-        
+
         S = S * (sigma_list[i] ** (2 * gamma))
 
         # Compute trace of the structure tensor matrix
