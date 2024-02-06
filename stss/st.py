@@ -1,6 +1,10 @@
 import numpy as np
 from stss import st2d, st3d, util
-import warnings
+
+import logging
+import sys
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s : %(levelname)s : %(module)s : %(message)s', datefmt='%I:%M:%S')
+logger = logging.getLogger(__name__)
 
 def structure_tensor(
     image, sigma, ring_filter=True, rho=None, out_S=None, eig_decomp=True, truncate=4.0
@@ -119,7 +123,7 @@ def scale_space(
         raise ValueError("Image must be 2D or 3D.")
     
     if gamma != 1.2:
-        warnings.warn("Gamma is not 1.2. This may result in icorrect scale space calculation.")
+        logger.warning("Gamma is not 1.2. This may result in icorrect scale space calculation.")
 
     # Repeat rho if None
     if rho_list is None:
@@ -153,6 +157,8 @@ def scale_space(
             S_opt = np.where(discr > discr_opt, S, S_opt)
             scale_opt = np.where(discr > discr_opt, sigma_list[i], scale_opt)
             discr_opt = np.where(discr > discr_opt, discr, discr_opt)
+
+        logger.info(f"Scale {np.round(sigma_list[i],3)} done.")
 
     # Compute eigenvalues and eigenvectors of the structure tensor
     if image.ndim == 2:

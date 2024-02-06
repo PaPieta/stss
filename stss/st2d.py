@@ -1,11 +1,8 @@
 """2D structure tensor module."""
-import logging
-
 import numpy as np
 from scipy import ndimage
 
 from stss import util
-
 
 def structure_tensor_2d(
     image, sigma, ring_filter=True, rho=None, out=None, truncate=4.0
