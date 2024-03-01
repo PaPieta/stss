@@ -3,6 +3,8 @@
 
 Forked from and based on Niels Jeppesen's [structure tensor repository](https://github.com/Skielex/structure-tensor/tree/master). Contains its basic functionality, with extra support of structure tensor scale space and expansion to a ring filter instead of the integrating filter.
 
+In-depth examples can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v1).
+
 For theoretical details see: (Publication to be added)
 
 ## Installation
@@ -64,6 +66,7 @@ S, val, vec, scale = st.scale_space(volume, sigma_list)
 <!-- ## Advanced examples --> 
 <!-- TODO -->
 
+In-depth examples can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v1).
 
 ## Contributions
 Contributions are welcome, just create an [issue](https://github.com/PaPieta/st-v2-ss/issues) or a [PR](https://github.com/PaPieta/st-v2-ss/pulls).
