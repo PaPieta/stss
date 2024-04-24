@@ -24,12 +24,12 @@ Library requires ```numpy``` and ```scipy```, they can be installed via provided
 ```
 
 ## Tiny Examples
-The only parameter necessary for this version of structure tensor calculation is  $\sigma$ (```sigma```), which is a scalar values.
+The only parameter necessary for this version of structure tensor calculation is  $\sigma$ (```sigma```), which is a scalar.
 
 It is possible to disable the ring filter and use the original structure tensor definition, then another scalar parameter $\rho$ (```rho```) is necessary.
 
 ### Single scale for 2D and 3D 
-The ```st2ss``` package support doing either 2D or 3D structure tensor analysis. The appropriate algorithm is chosen based on the dimensionality of the provided array. Eigenvalues (```val```) are sorted acending.
+The ```st2ss``` package supports running either 2D or 3D structure tensor analysis. The appropriate algorithm is chosen based on the dimensionality of the provided array. Eigenvalues (```val```) are sorted acending.
 
 ``` python
 import numpy as np
