@@ -74,7 +74,19 @@ Contributions are welcome, just create an [issue](https://github.com/PaPieta/st-
 ## Reference
 If you use this any of this for academic work, please consider citing our work.
 
-(Publication to be added)
+> Pieta, Pawel Tomasz, et al. Feature-Centered First Order Structure Tensor Scale-Space in 2D and 3D. 2024, 
+[ [paper](https://doi.org/10.48550/arXiv.2409.13389) ]
+
+``` bibtex
+@article{pieta2024a,
+  author = {Pieta, Pawel Tomasz and Dahl, Anders Bjorholm and Frisvad, Jeppe Revall and Bigdeli, Siavash Arjomand and Christensen, Anders Nymark},
+  title = {Feature-Centered First Order Structure Tensor Scale-Space in 2D and 3D},
+  language = {eng},
+  format = {article},
+  year = {2024},
+  doi = {10.48550/arXiv.2409.13389}
+}
+```
 
 ## More information
 - [Wikipedia - Structure tensor](https://en.wikipedia.org/wiki/Structure_tensor)
