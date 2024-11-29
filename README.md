@@ -3,7 +3,7 @@
 
 Forked from and based on Niels Jeppesen's [structure tensor repository](https://github.com/Skielex/structure-tensor/tree/master). Contains its basic functionality, with extra support of structure tensor scale space and expansion to a ring filter instead of the integrating filter.
 
-For theoretical details see: (Publication to be added)
+For theoretical details see: [ArXiv Paper](https://arxiv.org/abs/2409.13389)
 
 In-depth examples, as well as reproduced figures from the publication can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v1).
 
