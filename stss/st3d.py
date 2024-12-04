@@ -41,7 +41,7 @@ def structure_tensor_3d(
             An array with shape (6, volume.shape) containing elements of structure tensor
             (s_xx, s_yy, s_zz, s_xy, s_xz, s_yz).
 
-    Authors: vand@dtu.dk, 2019; niejep@dtu.dk, 2019-2020
+    Authors: vand@dtu.dk, 2019; niejep@dtu.dk, 2019-2020, papi@dtu.dk, 2022-2024
     """
 
     # Make sure it's a Numpy array.
@@ -66,13 +66,13 @@ def structure_tensor_3d(
 
     # Computing derivatives (scipy implementation truncates filter at 4 sigma).
     Vx = filters.gaussian_filter(
-        volume, sigma, order=[0, 0, 1], mode="nearest", truncate=truncate
+        volume, sigma, order=[1, 0, 0], mode="nearest", truncate=truncate
     )
     Vy = filters.gaussian_filter(
         volume, sigma, order=[0, 1, 0], mode="nearest", truncate=truncate
     )
     Vz = filters.gaussian_filter(
-        volume, sigma, order=[1, 0, 0], mode="nearest", truncate=truncate
+        volume, sigma, order=[0, 0, 1], mode="nearest", truncate=truncate
     )
 
     if out is None:
@@ -328,5 +328,5 @@ def eig_special_3d(S, full=False):
     # Reshape and return.
     val = val.reshape(val.shape[:-1] + input_shape[1:])
     vec = vec.reshape(vec.shape[:-1] + input_shape[1:])
-    vec = vec[[2, 1, 0], :]  # Reorder eigenvectors to XYZ order
+    
     return val, vec
