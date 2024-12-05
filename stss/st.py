@@ -1,5 +1,5 @@
 import numpy as np
-from stss import st2d, st3d, util
+from stss import st2d, st3d, util, st3d_cupy
 
 import logging
 import sys
@@ -26,7 +26,7 @@ def structure_tensor(
         ring_filter: bool
             If True, runs the algorithm version with ring filter instead of the integration filter
         rho: scalar
-            Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
+            Only if ring_filter=False. An integration scale corresponding to the size over the neighborhood in which the
             orientation is to be analysed.
         out_S: ndarray, optional
             A Numpy array in which to place the output elements of structure tensor S.
@@ -45,6 +45,7 @@ def structure_tensor(
     Authors: papi@dtu.dk, 2023
     """
 
+
     if out_S is None:
         # Allocate S.
         if image.ndim == 2:
@@ -54,7 +55,7 @@ def structure_tensor(
         else:
             raise ValueError("Image must be 2D or 3D.")
     else:
-        # S is already allocated. We assume the size is correct.
+        # S is already allocated.
         S = out_S
 
     if image.ndim == 2:
@@ -90,15 +91,15 @@ def scale_space(
     Arguments:
         image: array_like
             A 2D or 3D array containing the image.
-        sigma: scalar
-            Derivative Gaussian filter size, correlated to feature size if ring_filter=True.
+        sigma: list
+            List of derivative Gaussian filter sizes, correlated to feature size if ring_filter=True.
         correctScale: bool
             If True, the scale values are corrected to better reflect the feature size.
             Set to False for easier scale range selection.
         ring_filter: bool
             If True, runs the algorithm version with ring filter instead of the integration filter
-        rho: scalar
-            Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
+        rho: list
+            Only if ring_filter=False. List of integration scales corresponding to the size over the neighborhood in which the
             orientation is to be analysed.
         gamma: float
             Scale-space normalization parameter. Should be set to 1.2, change only for experimental purposes.
@@ -117,13 +118,12 @@ def scale_space(
 
     Authors: papi@dtu.dk, 2023
     """
-
+        
     if correctScale and not ring_filter:
         raise ValueError(
             "Scale correction returns incorrect values if ring filter is disabled. Set correctScale=False or ring_filter=True."
         )
 
-    # Allocate S.
     if image.ndim == 2:
         S_opt = np.empty((3,) + image.shape, dtype=image.dtype)
         S = np.empty((3,) + image.shape, dtype=image.dtype)
@@ -135,6 +135,7 @@ def scale_space(
     else:
         raise ValueError("Image must be 2D or 3D.")
 
+
     if gamma != 1.2:
         logger.warning(
             "Gamma is not 1.2. This may result in icorrect scale space calculation."
@@ -142,7 +143,7 @@ def scale_space(
 
     # Repeat rho if None
     if rho_list is None:
-        rho_list = np.repeat(None, len(sigma_list))
+        rho_list = [None for _ in range(len(sigma_list))]
 
     # Loop over scales
     for i in range(len(sigma_list)):
@@ -159,7 +160,7 @@ def scale_space(
 
         # Normalize S scale response
 
-        S = S * (sigma_list[i] ** (2 * gamma))
+        S *= (sigma_list[i] ** (2 * gamma))
 
         # Compute trace of the structure tensor matrix
         discr = np.sum(S[0 : np.ceil(S_size / 2).astype(int)], axis=0)
