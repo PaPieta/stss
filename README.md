@@ -3,7 +3,7 @@
 
 Forked from and based on Niels Jeppesen's [structure tensor repository](https://github.com/Skielex/structure-tensor/tree/master). Contains its basic functionality, with extra support of structure tensor scale space and expansion to a ring filter instead of the integrating filter.
 
-For theoretical details see: [ArXiv Paper](https://arxiv.org/abs/2409.13389)
+For theoretical details see: [Paper](https://ieeexplore.ieee.org/document/10833649), [ArXiv](https://arxiv.org/abs/2409.13389)
 
 In-depth examples, as well as reproduced figures from the publication can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v1).
 
@@ -75,17 +75,18 @@ Contributions are welcome, just create an [issue](https://github.com/PaPieta/st-
 If you use this any of this for academic work, please consider citing our work.
 
 > Pieta, Pawel Tomasz, et al. Feature-Centered First Order Structure Tensor Scale-Space in 2D and 3D. 2024, 
-[ [paper](https://doi.org/10.48550/arXiv.2409.13389) ]
+[[paper](https://ieeexplore.ieee.org/document/10833649)]
 
 ``` bibtex
-@article{pieta2024a,
-  author = {Pieta, Pawel Tomasz and Dahl, Anders Bjorholm and Frisvad, Jeppe Revall and Bigdeli, Siavash Arjomand and Christensen, Anders Nymark},
-  title = {Feature-Centered First Order Structure Tensor Scale-Space in 2D and 3D},
-  language = {eng},
-  format = {article},
-  year = {2024},
-  doi = {10.48550/arXiv.2409.13389}
-}
+@article{pieta2025a,
+  author={Pieta, Pawel Tomasz and Dahl, Anders Bjorholm and Frisvad, Jeppe Revall and Bigdeli, Siavash Arjomand and Christensen, Anders Nymark},
+  journal={IEEE Access}, 
+  title={Feature-Centered First Order Structure Tensor Scale-Space in 2D and 3D}, 
+  year={2025},
+  volume={13},
+  number={},
+  pages={9766-9779},
+  doi={10.1109/ACCESS.2025.3527227}}
 ```
 
 ## More information

@@ -191,7 +191,6 @@ def scale_space(
 
     val = cp.asnumpy(val)
     vec = cp.asnumpy(vec)
-    S_opt = cp.asnumpy(S_opt)
     
     # Apply optional scale correction
     if correctScale:
