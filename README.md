@@ -5,7 +5,7 @@ Forked from and based on Niels Jeppesen's [structure tensor repository](https://
 
 For theoretical details see: [Paper](https://ieeexplore.ieee.org/document/10833649), [ArXiv](https://arxiv.org/abs/2409.13389)
 
-In-depth examples, as well as reproduced figures from the publication can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v1).
+In-depth examples, as well as reproduced figures from the publication can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v2).
 
 ## Installation
 1. Clone the repository.
@@ -66,7 +66,7 @@ S, val, vec, scale = st.scale_space(volume, sigma_list)
 <!-- ## Advanced examples --> 
 <!-- TODO -->
 
-In-depth examples can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v1).
+In-depth examples can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v2).
 
 ## Contributions
 Contributions are welcome, just create an [issue](https://github.com/PaPieta/st-v2-ss/issues) or a [PR](https://github.com/PaPieta/st-v2-ss/pulls).
