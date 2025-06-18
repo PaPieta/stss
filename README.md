@@ -8,15 +8,10 @@ For theoretical details see: [Paper](https://ieeexplore.ieee.org/document/108336
 In-depth examples, as well as reproduced figures from the publication can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v2).
 
 ## Installation
-1. Clone the repository.
-2. Install the library
 
+``` python
+pip install git+https://github.com/PaPieta/stss.git
 ```
-   cd stss
-   pip install .
-```
-> Support for direct pip installation coming soon
-
 # Prerequisites
 Library requires ```numpy``` and ```scipy```, they can be installed via provided requirements file:
 ```sh
