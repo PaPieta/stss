@@ -1,5 +1,5 @@
 import numpy as np
-from stss import st2d, st3d, util, st3d_cupy
+from stss import st2d, st3d, util
 
 import logging
 import sys
