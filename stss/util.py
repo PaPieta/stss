@@ -1,4 +1,8 @@
+from typing import Union
+
 import numpy as np
+import numpy.typing as npt
+
 from scipy.ndimage import convolve1d
 
 # Constant values for scale correction
@@ -13,7 +17,7 @@ C_3D_PLAN = 1
 C_3D_SPH = 0.0158
 
 
-def gauss_no_norm(t, truncate=4.0):
+def gauss_no_norm(t: float, truncate: float = 4.0) -> npt.NDArray[np.floating]:
     """Returns a 1D Gaussian function without the normalizing constant.
 
     Arguments:
@@ -23,7 +27,7 @@ def gauss_no_norm(t, truncate=4.0):
             Truncate the filter at this many standard deviations. Default is 4.0.
 
     Returns:
-        g: ndarray
+        g: npt.NDArray
             A 1D array containing values of the unnormalized Gaussian.
 
     Authors:
@@ -36,11 +40,17 @@ def gauss_no_norm(t, truncate=4.0):
     return g
 
 
-def ring_convolve(image, sigma_r, truncate=4.0, mode="nearest", cval=0.0, origin=0):
+def ring_convolve(image: npt.NDArray[np.floating], 
+                  sigma_r: float, 
+                  truncate : float = 4.0, 
+                  mode: str = "nearest", 
+                  cval: float = 0.0, 
+                  origin: int = 0
+) -> npt.NDArray[np.floating]:
     """Convolves an image with a ring filter.
 
     Arguments:
-        image: ndarray
+        image: npt.NDArray
             A 2D or 3D array containing the image.
         sigma_r: float
             Ring filter size based on Gaussian variance.
@@ -50,7 +60,7 @@ def ring_convolve(image, sigma_r, truncate=4.0, mode="nearest", cval=0.0, origin
             see scipy.ndimage.convolve1d
 
     Returns:
-        image: ndarray
+        image: npt.NDArray
             A 2D array containing the convolved image.
 
     Authors:
@@ -80,17 +90,17 @@ def ring_convolve(image, sigma_r, truncate=4.0, mode="nearest", cval=0.0, origin
     return output
 
 
-def correct_scale(scale, val):
+def correct_scale(scale: Union[float, npt.NDArray[np.floating]], val: npt.NDArray[np.floating]) -> Union[float, npt.NDArray[np.floating]]:
     """Corrects the scale values assigned to each pixel, to better reflect feature sizes.
 
     Arguments:
-        scale: float
+        scale: float|npt.NDArray
             Scale of the structure tensor features.
-        val: ndarray
+        val: npt.NDArray
             Eigenvalues of the structure tensor.
 
     Returns:
-        scale:
+        scale: float|npt.NDArray
             Corrected scale of the structure tensor features.
 
     Authors:

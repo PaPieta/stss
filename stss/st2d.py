@@ -1,5 +1,8 @@
 """2D structure tensor module."""
+from typing import Union, Tuple
+
 import numpy as np
+import numpy.typing as npt
 from scipy import ndimage
 
 from stss import util
@@ -16,28 +19,32 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def structure_tensor_2d(
-    image, sigma, ring_filter=True, rho=None, out=None, truncate=4.0
-):
+def structure_tensor_2d(image: npt.ArrayLike, 
+                        sigma: float, 
+                        ring_filter: bool = True, 
+                        rho: Union[None, float] = None, 
+                        out: Union[None, npt.NDArray[np.floating]] = None, 
+                        truncate: float = 4.0
+) -> npt.NDArray[np.floating]:
     """Structure tensor for 2D image data.
 
     Arguments:
-        image: array_like
+        image: npt.ArrayLike
             A 2D array. Pass ndarray to avoid copying image.
-        sigma: scalar
+        sigma: float
             Derivative Gaussian filter size, correlated to feature size if ring_filter=True.
         ring_filter: bool
             If True, runs the algorithm version with ring filter instead of the integration filter
-        rho: scalar
+        rho: float
             Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
             orientation is to be analysed.
-        out: ndarray, optinal
+        out: npt.NDArray, optional
             A Numpy array with the shape (3, volume.shape) in which to place the output.
         truncate: float
             Truncate the filter at this many standard deviations. Default is 4.0.
 
     Returns:
-        S: ndarray
+        S: npt.NDArray
             An array with shape (3, image.shape) containing elements of structure tensor
             (s_xx, s_yy, s_xy).
 
@@ -51,17 +58,17 @@ def structure_tensor_2d(
     # Check data type. Must be floating point.
     if not np.issubdtype(image.dtype, np.floating):
         logging.warning(
-            "image is not floating type array. This may result in a loss of precision and unexpected behavior."
+            "Image is not floating type array. This may result in a loss of precision and unexpected behavior."
         )
 
     # Check user input (ring filter vs integration filter).
     if ring_filter is True and rho is not None:
         logging.warning(
-            "rho is set with active ring filter. Rho value will have no effect."
+            "Rho is set with active ring filter. Rho value will have no effect."
         )
     elif ring_filter is False and rho is None:
         logging.warning(
-            "rho is not set while ring filter is disabled. Rho value will be set to 2*sigma."
+            "Rho is not set while ring filter is disabled. Rho value will be set to 2*sigma."
         )
         rho = 2 * sigma
 
@@ -110,17 +117,17 @@ def structure_tensor_2d(
     return S
 
 
-def eig_special_2d(S):
+def eig_special_2d(S: npt.ArrayLike) -> Tuple[npt.NDArray[np.floating], npt.NDArray[np.floating]]:
     """Eigensolution for symmetric real 2-by-2 matrices.
 
     Arguments:
-        S: ndarray
+        S: npt.ArrayLike
             A floating point array with shape (3, ...) containing structure tensor.
 
     Returns:
-        val: ndarray
+        val: npt.NDArray
             An array with shape (2, ...) containing sorted eigenvalues.
-        vec: ndarray
+        vec: npt.NDArray
             An array with shape (2, ...) containing eigenvector corresponding
             to the smallest eigenvalue (the other is orthogonal to the first).
 

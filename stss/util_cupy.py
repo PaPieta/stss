@@ -4,7 +4,7 @@ import cupyx as cpx
 from cupyx.scipy.ndimage import convolve1d
 
 
-def gauss_no_norm(t:float, truncate:float=4.0) -> cpt.NDArray:
+def gauss_no_norm(t: float, truncate: float = 4.0) -> cpt.NDArray:
     """Returns a 1D Gaussian function without the normalizing constant.
 
     Arguments:
@@ -14,7 +14,7 @@ def gauss_no_norm(t:float, truncate:float=4.0) -> cpt.NDArray:
             Truncate the filter at this many standard deviations. Default is 4.0.
 
     Returns:
-        g: ndarray
+        g: cpt.NDArray
             A 1D array containing values of the unnormalized Gaussian.
 
     Authors:
@@ -27,11 +27,17 @@ def gauss_no_norm(t:float, truncate:float=4.0) -> cpt.NDArray:
     return g
 
 
-def ring_convolve(image:cpt.ArrayLike, sigma_r: float, truncate:float=4.0, mode:str="nearest", cval:float=0.0, origin:int=0) -> cpt.NDArray:
+def ring_convolve(image: cpt.ArrayLike, 
+                  sigma_r: float, 
+                  truncate: float = 4.0, 
+                  mode: str = "nearest", 
+                  cval: float = 0.0, 
+                  origin: int = 0
+) -> cpt.NDArray[cp.floating]:
     """Convolves an image with a ring filter.
 
     Arguments:
-        image: ndarray
+        image: cpt.ArrayLike
             A 2D or 3D array containing the image.
         sigma_r: float
             Ring filter size based on Gaussian variance.
@@ -41,7 +47,7 @@ def ring_convolve(image:cpt.ArrayLike, sigma_r: float, truncate:float=4.0, mode:
             see scipy.ndimage.convolve1d
 
     Returns:
-        image: ndarray
+        image: cpt.NDArray
             A 2D array containing the convolved image.
 
     Authors:

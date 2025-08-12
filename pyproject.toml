@@ -8,7 +8,20 @@ version = "0.1.0"
 authors = [{name = "Pawel Tomasz Pieta", email = "papi@dtu.dk"}]
 description = "2D and 3D structure tensor scale space implementation for Python."
 requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
 dynamic = ["dependencies"]
+readme = "README.md"
+license = {file = "LICENSE"}
+
+[project.urls]
+Homepage = "https://github.com/PaPieta/stss"
+Issues = "https://github.com/PaPieta/stss/issues"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools]
+packages = ["stss"]

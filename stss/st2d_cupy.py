@@ -1,9 +1,10 @@
-"""2D structure tensor module."""
+"""2D structure tensor module using CuPy."""
+from typing import Union, Tuple
+
 import cupy as cp
 import cupy.typing as cpt
 import cupyx as cpx
 from cupyx.scipy import ndimage
-
 
 from stss import util_cupy as util
 
@@ -22,30 +23,30 @@ logger = logging.getLogger(__name__)
 def structure_tensor_2d(
     image: cpt.ArrayLike,
     sigma: float,
-    ring_filter:bool=True,
-    rho:float=None,
-    out: cpt.NDArray | None = None,
+    ring_filter: bool = True,
+    rho: Union[None, float] = None,
+    out: Union[None,cpt.NDArray[cp.floating]] = None,
     truncate: float = 4.0,
 ) -> cpt.NDArray:
-    """Structure tensor for 2D image data.
+    """Structure tensor for 2D image data using CuPy.
 
     Arguments:
-        image: array_like
+        image: cpt.ArrayLike
             A 2D array. Pass ndarray to avoid copying image.
-        sigma: scalar
+        sigma: float
             Derivative Gaussian filter size, correlated to feature size if ring_filter=True.
         ring_filter: bool
             If True, runs the algorithm version with ring filter instead of the integration filter
-        rho: scalar
+        rho: float
             Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
             orientation is to be analysed.
-        out: ndarray, optinal
+        out: cpt.ArrayLike, optinal
             A Numpy array with the shape (3, volume.shape) in which to place the output.
         truncate: float
             Truncate the filter at this many standard deviations. Default is 4.0.
 
     Returns:
-        S: ndarray
+        S: cpt.ArrayLike
             An array with shape (3, image.shape) containing elements of structure tensor
             (s_xx, s_yy, s_xy).
 
@@ -118,17 +119,17 @@ def structure_tensor_2d(
     return S
 
 
-def eig_special_2d(S: cpt.ArrayLike):
+def eig_special_2d(S: cpt.ArrayLike) -> Tuple[cpt.NDArray[cp.floating], cpt.NDArray[cp.floating]]:
     """Eigensolution for symmetric real 2-by-2 matrices.
 
     Arguments:
-        S: ndarray
+        S: cpt.ArrayLike
             A floating point array with shape (3, ...) containing structure tensor.
 
     Returns:
-        val: ndarray
+        val: cpt.NDArray
             An array with shape (2, ...) containing sorted eigenvalues.
-        vec: ndarray
+        vec: cpt.NDArray
             An array with shape (2, ...) containing eigenvector corresponding
             to the smallest eigenvalue (the other is orthogonal to the first).
 

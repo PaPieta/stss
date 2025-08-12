@@ -1,7 +1,5 @@
 """3D structure tensor module using CuPy."""
-
-import logging
-from typing import Literal
+from typing import Union, Tuple
 
 import cupy as cp
 import cupy.typing as cpt
@@ -10,25 +8,47 @@ from cupyx.scipy import ndimage
 
 from stss import util_cupy as util
 
+import logging
+import sys
+
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.WARNING,
+    format="%(asctime)s : %(levelname)s : %(module)s : %(message)s",
+    datefmt="%I:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
 
 def structure_tensor_3d(
     volume: cpt.ArrayLike,
     sigma: float,
-    ring_filter:bool=True,
-    rho:float=None,
-    out: cpt.NDArray | None = None,
+    ring_filter: bool = True,
+    rho: Union[None, float] = None,
+    out: Union[None,cpt.NDArray[cp.floating]] = None,
     truncate: float = 4.0,
 ) -> cpt.NDArray:
-    """Calculate the structure tensor for 3D image data.
+    """Structure tensor for 3D image data using CuPy.
 
-    Args:
-        volume: A 3D array. Pass `cupy.ndarray` to avoid copying volume.
-        sigma: A noise scale, structures smaller than sigma will be removed by smoothing.
-        rho: An integration scale giving the size over the neighborhood in which the orientation is to be analysed.
-        out: An array with the shape `(6, ...)` in which to place the output. If `None`, a new array is created.
-        truncate: Truncate the filter at this many standard deviations.
+    Arguments:
+        volume: cpt.ArrayLike
+            A 3D array. Pass ndarray to avoid copying volume.
+        sigma: float
+            Derivative Gaussian filter size, correlated to feature size if ring_filter=True.
+        ring_filter: bool
+            If True, runs the algorithm version with ring filter instead of the integration filter
+        rho: float
+            Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
+            orientation is to be analysed.
+        out: cpt.NDArray, optional
+            A Numpy array with the shape (6, volume.shape) in which to place the output.
+        truncate: float
+            Truncate the filter at this many standard deviations. Default is 4.0.
+
     Returns:
-        S: An array with shape `(6, ...)` containing elements of structure tensor `(s_xx, s_yy, s_zz, s_xy, s_xz, s_yz)`.
+        S: cpt.NDArray
+            An array with shape (6, volume.shape) containing elements of structure tensor
+            (s_xx, s_yy, s_zz, s_xy, s_xz, s_yz).
 
     Authors: vand@dtu.dk, 2019; niejep@dtu.dk, 2019-2024, papi@dtu.dk, 2022-2024
     """
@@ -122,16 +142,24 @@ def structure_tensor_3d(
 def eig_special_3d(
     S: cpt.ArrayLike,
     full: bool = False
-) -> tuple[cpt.NDArray, cpt.NDArray]:
+) -> Tuple[cpt.NDArray[cp.floating], cpt.NDArray[cp.floating]]:
     """Eigensolution for symmetric real 3-by-3 matrices.
 
-    Args:
-        S: A floating point array with shape (6, ...) containing structure tensor. Use `float64` to avoid numerical errors. When using lower precision, ensure that the values of S are not very small/large. Pass `cupy.ndarray` to avoid copying S.
-        full: A flag indicating that all three eigenvectors should be returned.
-        
+    Arguments:
+        S: cpt.ArrayLike
+            A floating point array with shape (6, ...) containing structure tensor.
+            Use float64 to avoid numerical errors. When using lower precision, ensure
+            that the values of S are not very small/large.
+        full: bool, optional
+            A flag indicating that all three eigenvalues should be returned.
+
     Returns:
-        val: An array with shape `(3, ...)` containing eigenvalues.
-        vec: An array with shape `(3, ...)` containing the vector corresponding to the smallest eigenvalue if `full` is `False`, otherwise `(3, 3, ...)` containing eigenvectors.
+        val: cpt.NDArray
+            An array with shape (3, ...) containing sorted eigenvalues
+        vec: cpt.NDArray
+            An array with shape (3, ...) containing eigenvector corresponding to
+            the smallest eigenvalue. If full, vec has shape (3, 3, ...) and contains
+            all three eigenvectors.
 
     More:
         An analytic solution of eigenvalue problem for real symmetric matrix,

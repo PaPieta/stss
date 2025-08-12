@@ -1,6 +1,9 @@
 """3D structure tensor module."""
+from typing import Union, Tuple
+
 import numpy as np
-from scipy.ndimage import filters
+import numpy.typing as npt
+from scipy import ndimage
 
 from stss import util
 
@@ -16,28 +19,32 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def structure_tensor_3d(
-    volume, sigma, ring_filter=True, rho=None, out=None, truncate=4.0
-):
+def structure_tensor_3d(volume: npt.ArrayLike, 
+                        sigma: float, 
+                        ring_filter: bool = True, 
+                        rho: Union[None, float] = None, 
+                        out: Union[None, npt.NDArray[np.floating]] = None, 
+                        truncate: float = 4.0
+) -> npt.NDArray[np.floating]:
     """Structure tensor for 3D image data.
 
     Arguments:
-        volume: array_like
+        volume: npt.ArrayLike
             A 3D array. Pass ndarray to avoid copying volume.
-        sigma: scalar
+        sigma: float
             Derivative Gaussian filter size, correlated to feature size if ring_filter=True.
         ring_filter: bool
             If True, runs the algorithm version with ring filter instead of the integration filter
-        rho: scalar
+        rho: float
             Only if ring_filter=False. An integration scale giving the size over the neighborhood in which the
             orientation is to be analysed.
-        out: ndarray, optional
+        out: npt.NDArray, optional
             A Numpy array with the shape (6, volume.shape) in which to place the output.
         truncate: float
             Truncate the filter at this many standard deviations. Default is 4.0.
 
     Returns:
-        S: ndarray
+        S: npt.NDArray
             An array with shape (6, volume.shape) containing elements of structure tensor
             (s_xx, s_yy, s_zz, s_xy, s_xz, s_yz).
 
@@ -65,13 +72,13 @@ def structure_tensor_3d(
         rho = 2 * sigma
 
     # Computing derivatives (scipy implementation truncates filter at 4 sigma).
-    Vx = filters.gaussian_filter(
+    Vx = ndimage.gaussian_filter(
         volume, sigma, order=[1, 0, 0], mode="nearest", truncate=truncate
     )
-    Vy = filters.gaussian_filter(
+    Vy = ndimage.gaussian_filter(
         volume, sigma, order=[0, 1, 0], mode="nearest", truncate=truncate
     )
-    Vz = filters.gaussian_filter(
+    Vz = ndimage.gaussian_filter(
         volume, sigma, order=[0, 0, 1], mode="nearest", truncate=truncate
     )
 
@@ -103,38 +110,38 @@ def structure_tensor_3d(
     else:
         # Integrating elements of structure tensor (scipy uses sequence of 1D).
         np.multiply(Vx, Vx, out=tmp)
-        filters.gaussian_filter(
+        ndimage.gaussian_filter(
             tmp, rho, mode="nearest", output=S[0], truncate=truncate
         )
         np.multiply(Vy, Vy, out=tmp)
-        filters.gaussian_filter(
+        ndimage.gaussian_filter(
             tmp, rho, mode="nearest", output=S[1], truncate=truncate
         )
         np.multiply(Vz, Vz, out=tmp)
-        filters.gaussian_filter(
+        ndimage.gaussian_filter(
             tmp, rho, mode="nearest", output=S[2], truncate=truncate
         )
         np.multiply(Vx, Vy, out=tmp)
-        filters.gaussian_filter(
+        ndimage.gaussian_filter(
             tmp, rho, mode="nearest", output=S[3], truncate=truncate
         )
         np.multiply(Vx, Vz, out=tmp)
-        filters.gaussian_filter(
+        ndimage.gaussian_filter(
             tmp, rho, mode="nearest", output=S[4], truncate=truncate
         )
         np.multiply(Vy, Vz, out=tmp)
-        filters.gaussian_filter(
+        ndimage.gaussian_filter(
             tmp, rho, mode="nearest", output=S[5], truncate=truncate
         )
 
     return S
 
 
-def eig_special_3d(S, full=False):
+def eig_special_3d(S: npt.ArrayLike, full: bool = False) -> Tuple[npt.NDArray[np.floating], npt.NDArray[np.floating]]:
     """Eigensolution for symmetric real 3-by-3 matrices.
 
     Arguments:
-        S: ndarray
+        S: npt.ArrayLike
             A floating point array with shape (6, ...) containing structure tensor.
             Use float64 to avoid numerical errors. When using lower precision, ensure
             that the values of S are not very small/large.
@@ -142,9 +149,9 @@ def eig_special_3d(S, full=False):
             A flag indicating that all three eigenvalues should be returned.
 
     Returns:
-        val: ndarray
+        val: npt.NDArray
             An array with shape (3, ...) containing sorted eigenvalues
-        vec: ndarray
+        vec: npt.NDArray
             An array with shape (3, ...) containing eigenvector corresponding to
             the smallest eigenvalue. If full, vec has shape (3, 3, ...) and contains
             all three eigenvectors.

@@ -10,7 +10,7 @@ In-depth examples, as well as reproduced figures from the publication can be fou
 ## Installation
 
 ``` python
-pip install git+https://github.com/PaPieta/stss.git
+pip install stss
 ```
 # Prerequisites
 Library requires ```numpy``` and ```scipy```, they can be installed via provided requirements file:
@@ -19,12 +19,12 @@ Library requires ```numpy``` and ```scipy```, they can be installed via provided
 ```
 
 ## Tiny Examples
-The only parameter necessary for this version of structure tensor calculation is  $\sigma$ (```sigma```), which is a scalar.
+The only parameter necessary for this version of structure tensor calculation is $\sigma$ (```sigma```), which is a scalar.
 
 It is possible to disable the ring filter and use the original structure tensor definition, then another scalar parameter $\rho$ (```rho```) is necessary.
 
 ### Single scale for 2D and 3D 
-The ```st2ss``` package supports running either 2D or 3D structure tensor analysis. The appropriate algorithm is chosen based on the dimensionality of the provided array. Eigenvalues (```val```) are sorted acending.
+The ```st2ss``` package supports running either 2D or 3D structure tensor analysis. The appropriate algorithm is chosen based on the dimensionality of the provided array. Eigenvalues (```val```) are sorted ascending.
 
 ``` python
 import numpy as np
@@ -32,13 +32,14 @@ from stss import st
 
 sigma = 1.5
 
-# Load 2D data.
+# Load 2D or 3D data (np.array).
 image = np.random.random((128, 128))
+# image = np.random.random((128, 128, 128))
 
 S, val, vec = st.structure_tensor(image, sigma)
 ```
 
-Compared to the original [structure tensor repository](https://github.com/Skielex/structure-tensor/tree/master), for volume with shape ```(x, y, z)``` the eigenvectors (```vec```) are returned in the order ```xyz```, not ```zyx```.
+Compared to the original [structure tensor repository](https://github.com/Skielex/structure-tensor/tree/master), for volume with shape ```(x, y, z)``` the eigenvectors (```vec```) are returned in the intuitive order of ```xyz```, not ```zyx```.
 
 
 ### Scale Space
@@ -52,8 +53,9 @@ from stss import st
 
 sigma_list = np.arange(1,6,0.1)
 
-# Load 3D data.
-volume = np.random.random((128, 128, 128))
+# Load 2D or 3D data (np.array).
+image = np.random.random((128, 128))
+# image = np.random.random((128, 128, 128))
 
 S, val, vec, scale = st.scale_space(volume, sigma_list)
 ```
@@ -61,7 +63,13 @@ S, val, vec, scale = st.scale_space(volume, sigma_list)
 <!-- ## Advanced examples --> 
 <!-- TODO -->
 
-In-depth examples can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965/tree/v2).
+In-depth examples can be found and interactively tested in the associated [Code Ocean capsule](https://codeocean.com/capsule/8105965).
+
+### CUDA support
+
+To accelerate the calculation through CUDA, install [CuPy](https://github.com/cupy/cupy). Then, simply replace imports with ```from stss import st_cupy as st```, and proceed as usual.
+
+> CUDA support is in its early version. Some issues may arise.
 
 ## Contributions
 Contributions are welcome, just create an [issue](https://github.com/PaPieta/st-v2-ss/issues) or a [PR](https://github.com/PaPieta/st-v2-ss/pulls).
@@ -79,7 +87,6 @@ If you use this any of this for academic work, please consider citing our work.
   title={Feature-Centered First Order Structure Tensor Scale-Space in 2D and 3D}, 
   year={2025},
   volume={13},
-  number={},
   pages={9766-9779},
   doi={10.1109/ACCESS.2025.3527227}}
 ```

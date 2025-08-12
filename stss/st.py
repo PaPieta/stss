@@ -1,4 +1,7 @@
+from typing import Union, Tuple, List
+
 import numpy as np
+import numpy.typing as npt
 from stss import st2d, st3d, util
 
 import logging
@@ -14,21 +17,27 @@ logger = logging.getLogger(__name__)
 
 
 def structure_tensor(
-    image, sigma, ring_filter=True, rho=None, out_S=None, eig_decomp=True, truncate=4.0
-):
+    image: npt.ArrayLike, 
+    sigma: float, 
+    ring_filter: bool = True, 
+    rho: Union[None, float] = None, 
+    out_S: Union[None, npt.NDArray[np.floating]] = None, 
+    eig_decomp: bool = True, 
+    truncate: float = 4.0
+) -> Tuple[npt.NDArray[np.floating], npt.NDArray[np.floating], npt.NDArray[np.floating]]:
     """Generalized structure tensor for 2D and 3D data.
 
     Arguments:
-        image: array_like
+        image: npt.ArrayLike
             A 2D or 3D array containing the image.
-        sigma: scalar
+        sigma: float
             Derivative Gaussian filter size, correlated to feature size if ring_filter=True.
         ring_filter: bool
             If True, runs the algorithm version with ring filter instead of the integration filter
-        rho: scalar
+        rho: float
             Only if ring_filter=False. An integration scale corresponding to the size over the neighborhood in which the
             orientation is to be analysed.
-        out_S: ndarray, optional
+        out_S: npt.NDArray, optional
             A Numpy array in which to place the output elements of structure tensor S.
         eig_decomp: bool
             If True, the eigenvalues and eigenvectors of the structure tensor are computed.
@@ -36,11 +45,11 @@ def structure_tensor(
             Truncate the filter at this many standard deviations. Default is 4.0.
 
     Returns:
-        S: ndarray
+        S: npt.NDArray
             An array containing elements of structure tensor.
             If image is 2D, with shape (3, volume.shape), containing (s_xx, s_yy, s_xy).
             If image is 3D, with shape (6, volume.shape), containing (s_xx, s_yy, s_zz, s_xy, s_xz, s_yz).
-        val, vec: ndarray
+        val, vec: npt.NDArray
             Optional eigenvectors and eigenvalues of the structure tensor if eig_decomp=True.
     Authors: papi@dtu.dk, 2023
     """
@@ -77,28 +86,28 @@ def structure_tensor(
 
 
 def scale_space(
-    image,
-    sigma_list,
-    correctScale=True,
-    ring_filter=True,
-    rho_list=None,
-    gamma=1.2,
-    truncate=4.0,
-):
+    image: npt.ArrayLike,
+    sigma_list: List[float],
+    correctScale: bool = True,
+    ring_filter: bool = True,
+    rho_list: Union[None, List[float]] = None,
+    gamma: float = 1.2,
+    truncate: float = 4.0,
+) -> Tuple[npt.NDArray[np.floating], npt.NDArray[np.floating], npt.NDArray[np.floating], npt.NDArray[np.floating]]:
     """Structure tensor scale space for 2D and 3D data. Returns a single structure tensor result for each pixel,
     chosen based on the scale that returns the highest trace of the structure tensor matrix.
 
     Arguments:
-        image: array_like
+        image: npt.ArrayLike
             A 2D or 3D array containing the image.
-        sigma: list
+        sigma: list[float]
             List of derivative Gaussian filter sizes, correlated to feature size if ring_filter=True.
         correctScale: bool
             If True, the scale values are corrected to better reflect the feature size.
             Set to False for easier scale range selection.
         ring_filter: bool
             If True, runs the algorithm version with ring filter instead of the integration filter
-        rho: list
+        rho: list[float]
             Only if ring_filter=False. List of integration scales corresponding to the size over the neighborhood in which the
             orientation is to be analysed.
         gamma: float
@@ -107,13 +116,13 @@ def scale_space(
             Truncate the filter at this many standard deviations. Default is 4.0.
 
     Returns:
-        S: ndarray
+        S: npt.NDArray
             An array containing elements of structure tensor.
             If image is 2D, with shape (3, volume.shape), containing (s_xx, s_yy, s_xy).
             If image is 3D, with shape (6, volume.shape), containing (s_xx, s_yy, s_zz, s_xy, s_xz, s_yz).
-        val, vec: ndarray
+        val, vec: npt.NDArray
             Eigenvectors and eigenvalues of the structure tensor.
-        scale: ndarray
+        scale: npt.NDArray
             Scale values chosen for each pixels based on the structure tensor matrix trace
 
     Authors: papi@dtu.dk, 2023
