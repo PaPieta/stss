@@ -12,11 +12,6 @@ In-depth examples, as well as reproduced figures from the publication can be fou
 ``` python
 pip install stss
 ```
-# Prerequisites
-Library requires ```numpy``` and ```scipy```, they can be installed via provided requirements file:
-```sh
-  pip install -r requirements.txt
-```
 
 ## Tiny Examples
 The only parameter necessary for this version of structure tensor calculation is $\sigma$ (```sigma```), which is a scalar.
